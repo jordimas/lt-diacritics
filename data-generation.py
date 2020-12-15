@@ -23,6 +23,8 @@ import os
 import json
 from nltk.tokenize.toktok import ToktokTokenizer
 from pair import *
+from cleandiacritics import *
+from dictionary import Dictionary
 import datetime
 import operator
 
@@ -46,72 +48,6 @@ def init_logging():
     console = logging.StreamHandler()
     console.setLevel(logging.INFO)
     logger.addHandler(console)
-
-
-def load_dictionary():
-
-    input_file = 'diccionari.txt'
-    words = list()
-    WORD = 0
-    LEMA = 1
-    POS = 2
-
-    duplicated = set()
-    with open(input_file) as f:
-        while True:
-            line = f.readline()
-            if not line:
-                break
-
-            components = line.split()
-            _word = components[WORD].lower()
-
-            if _word in duplicated:
-                continue
-    
-            duplicated.add(_word)
-
-            lema =  components[LEMA].lower()
-            pos = Word._convert_to_readable_pos(components[POS])
-            word = Word(_word, lema, pos)
-        
-            words.append(word)
-
-    logging.debug(f"Words load from dictionary {len(words)}")
-    return words
-
-def _get_clean_diacritic(diacritic):
-    diacritic = diacritic.replace('à', 'a')
-    diacritic = diacritic.replace('é', 'e')
-    diacritic = diacritic.replace('è', 'e')
-    diacritic = diacritic.replace('í', 'i')
-    diacritic = diacritic.replace('ò', 'o')
-    diacritic = diacritic.replace('ó', 'o')
-    diacritic = diacritic.replace('ú', 'u')
-    return diacritic
-
-def get_pairs(dictionary):
-    words = {}
-    pairs = {}
-    for word in dictionary:
-        words[word.word] = word
-
-    for word in dictionary:
-        no_diatricic_word = _get_clean_diacritic(word.word)
-        if no_diatricic_word == word.word:
-            continue
-
-        if no_diatricic_word not in words:
-            continue
-
-        no_diacritic = words[no_diatricic_word]
-
-        pair = Pair(word, no_diacritic)
-        logging.debug(f"{word.word} - {word.pos}, {no_diacritic.word} - {no_diacritic.pos}")
-        pairs[word.word] = pair
-
-    return pairs
-
 
 
 def _get_tokenized_sentence(sentence):
@@ -188,7 +124,6 @@ def export_diacritics_with_no_rules(pairs):
 
         sorted_pairs = sorted(selected_pairs, key=lambda x: x.diacritic.frequency, reverse=True)
 
-        print(type(sorted_pairs))
         for pair in sorted_pairs:
             diacritic = pair.diacritic
             no_diacritic = pair.no_diacritic
@@ -201,12 +136,11 @@ def export_diacritics_with_no_rules(pairs):
 
 
 def analysis(corpus):
-    dictionary = load_dictionary()
-    pairs = get_pairs(dictionary)
-    #diacritics, no_diacritics = get_words_dictionaries(pairs)
+    dictionary = Dictionary()
+    dictionary.load_dictionary()
+    pairs = dictionary.get_pairs()
 
     set_dictionaries_frequencies_and_sentences(corpus, pairs)
-#    update_pairs(pairs, diacritics, no_diacritics)
 
     diacritics_corpus = 0
     position = 0
@@ -242,11 +176,11 @@ def analysis(corpus):
             writer.write(msg)
 
     diacritics_dict = len(pairs)
-    pdiacritics_dict = diacritics_dict * 100 / len(dictionary)
+    pdiacritics_dict = diacritics_dict * 100 / len(dictionary.words)
     pdiacritics_corpus = diacritics_corpus * 100 / diacritics_dict
     
 
-    logging.info(f"Total unique words in dictionary: {len(dictionary)}")
+    logging.info(f"Total unique words in dictionary: {len(dictionary.words)}")
     logging.info(f"Diacritic/no diacritic {diacritics_dict} ({pdiacritics_dict:.2f}%) (in dictionary)")
     logging.info(f"Diacritic/no diacritic {diacritics_corpus} ({pdiacritics_corpus:.2f}%) (in corpus)")
 
@@ -327,7 +261,7 @@ def run_lt(filename):
     return matches
 
 def _remove_diacritic_sentence(sentence, diacritic):
-    clean = _get_clean_diacritic(diacritic)
+    clean = get_clean_diacritic(diacritic)
     return sentence.replace(diacritic, clean)
 
 
@@ -372,7 +306,7 @@ def process_corpus(corpus, pairs):
             same_errors = 0
             cnt = cnt + 1
 
-            name = _get_clean_diacritic(diacritic.word)
+            name = get_clean_diacritic(diacritic.word)
             filename_diacritics = f'data/{name}_dia'
             filename_nodiacritics = f'data/{name}_nodia'
             _write_debug_files(filename_diacritics, filename_nodiacritics, pair)
