@@ -21,10 +21,10 @@
 import logging
 import os
 import json
-from nltk.tokenize.toktok import ToktokTokenizer
 from pair import *
 from cleandiacritics import *
 from dictionary import Dictionary
+from corpus import Corpus
 import datetime
 import operator
 
@@ -49,51 +49,6 @@ def init_logging():
     console.setLevel(logging.INFO)
     logger.addHandler(console)
 
-
-def _get_tokenized_sentence(sentence):
-    return _toktok.tokenize(sentence)        
-
-
-def set_dictionaries_frequencies_and_sentences(corpus, pairs):
-    logging.info("set_dictionaries_frequencies_and_sentences")
-
-    diacritics, no_diacritics = get_words_dictionaries(pairs)
-
-    with open(corpus, "r") as source:
-        while True:
-
-            src = source.readline().lower()
-
-            if not src:
-                break
-
-            words = _get_tokenized_sentence(src)
-            for word in words:
-                if word in diacritics:
-                    frequency = diacritics[word]
-                    diacritics[word] = frequency + 1
-
-                    pair = pairs[word]
-                    if len(pair.diacritic.sentences) < 10 and src not in pair.diacritic.sentences:
-                        pair.diacritic.sentences.append(src)
-
-                if word in no_diacritics:
-                    frequency = no_diacritics[word]
-                    no_diacritics[word] = frequency + 1
-
-    update_pairs(pairs, diacritics, no_diacritics)
-
-
-def update_pairs(pairs, diacritics, no_diacritics):
-    logging.info("update_pairs")
-    for pair in pairs.values():
-        if pair.diacritic.word in diacritics:
-            frequency = diacritics[pair.diacritic.word]
-            pair.diacritic.frequency = frequency
-
-        if pair.no_diacritic.word in no_diacritics:
-            frequency = no_diacritics[pair.no_diacritic.word]
-            pair.no_diacritic.frequency = frequency
 
 
 def export_diacritics_with_no_rules(pairs):
@@ -140,7 +95,8 @@ def analysis(corpus):
     dictionary.load_dictionary()
     pairs = dictionary.get_pairs()
 
-    set_dictionaries_frequencies_and_sentences(corpus, pairs)
+    diacritics, no_diacritics = Corpus().get_dictionaries_frequencies_and_sentences(corpus, pairs)
+    update_pairs(pairs, diacritics, no_diacritics)
 
     diacritics_corpus = 0
     position = 0
@@ -193,46 +149,7 @@ def analysis(corpus):
 
     return pairs
 
-'''
-    Returns a dictionary with word, sentences
-'''
-def _select_sentences_with_diacritics(filename, diacritics):
-    logging.info("_select_sentences_with_diacritics")
 
-    diacritics_sentences = {}
-    SHORT_SENTENCE = 10
-    with open(filename, "r") as source:
-        while True:
-            src = source.readline().lower()
-
-            if not src:
-                break
-        
-            words = _get_tokenized_sentence(src)
-            for word in words:
-                if word not in diacritics:
-                    continue
-
-                if len(words) < SHORT_SENTENCE:
-                    continue
-
-                if word in diacritics_sentences:
-                    sentences = diacritics_sentences[word]
-                else:
-                    sentences = []
-
-                if len(sentences) < 10 and src not in sentences:
-                    sentences.append(src)
-                    diacritics_sentences[word] = sentences
-
-    for diacritic in diacritics_sentences.keys():
-        sentences = diacritics_sentences[diacritic]
-        logging.debug(f"{diacritic}")
-        #for sentence in sentences:
-        #    logging.debug(f"  {sentence}")
-            
-
-    return diacritics_sentences
 
 command = 'curl --data "language=ca-ES"  --data-urlencode "text@{0}" {1} > "{2}" 2>/dev/null'
 server = 'http://172.17.0.2:7001/v2/check'

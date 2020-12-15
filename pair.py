@@ -79,6 +79,17 @@ def get_words_dictionaries(pairs):
     return diacritics, no_diacritics
 
 
+def update_pairs(pairs, diacritics, no_diacritics):
+    logging.info("update_pairs")
+    for pair in pairs.values():
+        if pair.diacritic.word in diacritics:
+            frequency = diacritics[pair.diacritic.word]
+            pair.diacritic.frequency = frequency
+
+        if pair.no_diacritic.word in no_diacritics:
+            frequency = no_diacritics[pair.no_diacritic.word]
+            pair.no_diacritic.frequency = frequency
+
 
 
 
