@@ -36,7 +36,7 @@ class Corpus(object):
         Returns a dictionary with word, sentences
     '''
     def _select_sentences_with_diacritics(self, filename, diacritics):
-        logging.info("_select_sentences_with_diacritics")
+        logging.debug("_select_sentences_with_diacritics")
 
         diacritics_sentences = {}
         SHORT_SENTENCE = 10
@@ -75,7 +75,7 @@ class Corpus(object):
 
 
     def get_dictionaries_frequencies_and_sentences(self, corpus, pairs):
-        logging.info("set_dictionaries_frequencies_and_sentences")
+        logging.debug("set_dictionaries_frequencies_and_sentences")
 
         diacritics, no_diacritics = get_words_dictionaries(pairs)
 

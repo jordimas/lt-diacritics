@@ -32,9 +32,6 @@ ERROR_NOT_DETECTED = 0
 ERROR_DETECTED = 1
 ERROR_NOT_INCORPUS = 2
 
-_toktok = ToktokTokenizer()
-
-
 def init_logging():
     logfile = 'data-generation.log'
 
@@ -50,7 +47,6 @@ def init_logging():
     logger.addHandler(console)
 
 
-
 def export_diacritics_with_no_rules(pairs):
 
     selected_pairs = []  
@@ -59,7 +55,7 @@ def export_diacritics_with_no_rules(pairs):
         diacritic = pair.diacritic
         no_diacritic = pair.no_diacritic
 
-        if diacritic.detected != ERROR_DETECTED:
+        if diacritic.detected == ERROR_DETECTED or diacritic.detected == ERROR_NOT_INCORPUS:
             continue
 
         frequency = no_diacritic.frequency * 100 / diacritic.frequency
@@ -135,17 +131,16 @@ def analysis(corpus):
     pdiacritics_dict = diacritics_dict * 100 / len(dictionary.words)
     pdiacritics_corpus = diacritics_corpus * 100 / diacritics_dict
     
-
     logging.info(f"Total unique words in dictionary: {len(dictionary.words)}")
-    logging.info(f"Diacritic/no diacritic {diacritics_dict} ({pdiacritics_dict:.2f}%) (in dictionary)")
-    logging.info(f"Diacritic/no diacritic {diacritics_corpus} ({pdiacritics_corpus:.2f}%) (in corpus)")
+    logging.info(f"Words with diacritic/no diacritic version {diacritics_dict} ({pdiacritics_dict:.2f}%) (in dictionary)")
+    logging.info(f"Words with diacritic/no diacritic {diacritics_corpus} ({pdiacritics_corpus:.2f}%) (in corpus)")
 
 
     len_pos = total = sum(int(v) for v in not_found_in_corpus_pos.values())
     for pos in not_found_in_corpus_pos:
         counter = not_found_in_corpus_pos[pos]
         pcounter = counter * 100 / len_pos
-        logging.info(f"Not found in corpus, category {pos} - {counter}  ({pcounter:.2f}%)")
+        logging.info(f"Not found in corpus, grammar category {pos} - number: {counter} ({pcounter:.2f}%)")
 
     return pairs
 
@@ -202,7 +197,7 @@ def _write_debug_files(filename_diacritics, filename_nodiacritics, pair):
 
 def process_corpus(corpus, pairs):
 
-    logging.info("process_corpus")
+    logging.debug("process_corpus")
     cnt = 0
 
     writer = open('diacritics-lt.csv', 'w')
@@ -211,8 +206,11 @@ def process_corpus(corpus, pairs):
     msg += f"total_freq\tcnt\tdetected\n"
     writer.write(msg)
 
+    position = 0
+    cnt_detected = 0
+    cnt_not_incorpus = 0
+    cnt_not_detected = 0
 
-    position = 0    
     for pair in pairs.values():
         diacritic = pair.diacritic
         sentences = pair.diacritic.sentences
@@ -232,10 +230,13 @@ def process_corpus(corpus, pairs):
             errors_nodiac = run_lt(filename_nodiacritics)
             if errors_diac == errors_nodiac:
                 detected = ERROR_NOT_DETECTED
+                cnt_not_detected = cnt_not_detected + 1
             else:
                 detected = ERROR_DETECTED
+                cnt_detected = cnt_detected +1
         else:
             detected = ERROR_NOT_INCORPUS
+            cnt_not_incorpus = cnt_not_incorpus + 1
             errors_diac = errors_nodiac = 0
      
         diacritic.detected = detected
@@ -247,19 +248,29 @@ def process_corpus(corpus, pairs):
         writer.write(msg)
 
         if detected != ERROR_DETECTED:
-            print(f"*** {diacritic.word} {diacritic.frequency} - {no_diacritic.word} {no_diacritic.frequency}")
+            logging.debug(f"*** {diacritic.word} {diacritic.frequency} - {no_diacritic.word} {no_diacritic.frequency}")
             for sentence in sentences[:10]:
-                print("   " + sentence)
+                logging.debug("   " + sentence)
 
     writer.close()
+
+    len_pairs = len(pairs)
+    pcnt_detected = cnt_detected * 100 / len_pairs
+    pcnt_not_detected = cnt_not_detected * 100 / len_pairs
+    pcnt_not_incorpus = cnt_not_incorpus * 100 / len_pairs
+
+    logging.info(f"Dicracritics detected by rules: {cnt_detected} ({pcnt_detected:.2f}%)")    
+    logging.info(f"Dicracritics not detected by rules: {cnt_not_detected} ({pcnt_not_detected:.2f}%)")
+    logging.info(f"Dicracritics not in corpus (no text to run rules): {cnt_not_incorpus} ({pcnt_not_incorpus:.2f}%)")
+
 
     export_diacritics_with_no_rules(pairs)
 
 def main():
     print("Generates diacritic data from dictionary.")
-    CORPUS = "5000.txt"
+#    CORPUS = "200000.txt"
 #    CORPUS = "500000.txt"
-#    CORPUS = "tgt-train.txt"
+    CORPUS = "tgt-train.txt"
 #    CORPUS = "ca_dedup.txt"
 
     start_time = datetime.datetime.now()
