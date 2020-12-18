@@ -79,6 +79,8 @@ class Corpus(object):
 
         diacritics, no_diacritics = get_words_dictionaries(pairs)
 
+        lines = 0
+        words_in_corpus = 0
         with open(corpus, "r") as source:
             while True:
 
@@ -87,7 +89,10 @@ class Corpus(object):
                 if not src:
                     break
 
+                lines = lines + 1
                 words = self._get_tokenized_sentence(src)
+                words_in_corpus += len(words)
+
                 for word in words:
                     if word in diacritics:
                         frequency = diacritics[word]
@@ -101,5 +106,6 @@ class Corpus(object):
                         frequency = no_diacritics[word]
                         no_diacritics[word] = frequency + 1
 
+        logging.info(f"Read corpus {corpus}, lines {lines}, words {words_in_corpus}")
         return diacritics, no_diacritics
 

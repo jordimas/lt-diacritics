@@ -49,8 +49,10 @@ def init_logging():
 
 def export_diacritics_with_no_rules(pairs):
 
-    selected_pairs = []  
+    FREQUENCY = 5 # In %
+    selected_pairs = []
 
+    logging.info(f"Maximum distance between frequencies {FREQUENCY}%")
     for pair in pairs.values():
         diacritic = pair.diacritic
         no_diacritic = pair.no_diacritic
@@ -59,7 +61,7 @@ def export_diacritics_with_no_rules(pairs):
             continue
 
         frequency = no_diacritic.frequency * 100 / diacritic.frequency
-        if frequency > 5: # 5%
+        if frequency > FREQUENCY:
             logging.debug(f"Discarted {diacritic.frequency} - {no_diacritic.frequency} - {frequency}")
             continue
 
@@ -260,18 +262,18 @@ def process_corpus(corpus, pairs):
     pcnt_not_detected = cnt_not_detected * 100 / len_pairs
     pcnt_not_incorpus = cnt_not_incorpus * 100 / len_pairs
 
-    logging.info(f"Dicracritics detected by rules: {cnt_detected} ({pcnt_detected:.2f}%)")    
-    logging.info(f"Dicracritics not detected by rules: {cnt_not_detected} ({pcnt_not_detected:.2f}%)")
-    logging.info(f"Dicracritics not in corpus (no text to run rules): {cnt_not_incorpus} ({pcnt_not_incorpus:.2f}%)")
+    logging.info(f"Diacritics detected by rules: {cnt_detected} ({pcnt_detected:.2f}%)")    
+    logging.info(f"Diacritics not detected by rules: {cnt_not_detected} ({pcnt_not_detected:.2f}%)")
+    logging.info(f"Diacritics not in corpus (no text to run rules): {cnt_not_incorpus} ({pcnt_not_incorpus:.2f}%)")
 
 
     export_diacritics_with_no_rules(pairs)
 
 def main():
     print("Generates diacritic data from dictionary.")
-#    CORPUS = "200000.txt"
+    CORPUS = "200000.txt"
 #    CORPUS = "500000.txt"
-    CORPUS = "tgt-train.txt"
+#    CORPUS = "tgt-train.txt"
 #    CORPUS = "ca_dedup.txt"
 
     start_time = datetime.datetime.now()
