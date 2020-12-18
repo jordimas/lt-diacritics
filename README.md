@@ -14,4 +14,9 @@ De les 888.650 formes, 60.689 (6.83%) són formes que existeixen amb versió amb
 
 El següent pas és entendre la freqüència d'aparició d'aquests parells (per exemple  bàsquet/basquet) als corpus, això ens dóna un senyal clar de si els s'usen o no freqüentment.
 
+# Resultats del projecte (18 desembre)
+
+* Ens ha permés identificar formes molt poc freqüents i ja no usades en el diccionaris que existeixen en versió amb accent i llevar-les dels diccionaris
+* S'ha millorat la regla que detectava formes balears
+* Hem creat una regla que basat amb la freqüència d'aparició de la palabra amb o sense accent (per exemple, 95% que aquesta paraula va sempre va amb accent) ho suggereixi
 
