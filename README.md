@@ -21,6 +21,6 @@ Ara entenem la freqüència d'aparició d'aquests parells (per exemple bàsquet/
 Millores a LanguageTool 5.2:
 
 * Ens ha permés identificar formes molt poc freqüents i ja no usades en el diccionari que existeixen en versió amb accent i llevar-les dels diccionaris
-* S'ha millorat la regla que detectava formes balears [CA_SIMPLE_REPLACE_BALEARIC](veure https://community.languagetool.org/rule/show/CA_SIMPLE_REPLACE_BALEARIC?lang=ca)
+* S'ha millorat la regla que detectava formes balears [CA_SIMPLE_REPLACE_BALEARIC](https://community.languagetool.org/rule/show/CA_SIMPLE_REPLACE_BALEARIC?lang=ca)
 * S'ha creat una regla nova [RARE_WORDS](https://community.languagetool.org/rule/show/RARE_WORDS?lang=ca) que basant-se amb la freqüència d'aparició de la paraula amb accent o sense (per exemple, 95% que aquesta paraula va sempre va amb accent) ho suggereixi
 
