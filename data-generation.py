@@ -238,6 +238,7 @@ def process_corpus(corpus, pairs):
             detected = ERROR_NOT_INCORPUS
             cnt_not_incorpus = cnt_not_incorpus + 1
             errors_diac = errors_nodiac = 0
+            logging.debug(f"Word not in corpus: {diacritic.word} {diacritic.frequency} - {no_diacritic.word} {no_diacritic.frequency}")
      
         diacritic.detected = detected
         total_freq = diacritic.frequency + no_diacritic.frequency
