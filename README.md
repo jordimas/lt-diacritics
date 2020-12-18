@@ -1,10 +1,10 @@
 # Introducció
 
-Al LanguageTool tenim més de 3500 de regles que han anat creixent amb els anys per a identificar aquests errors.
-
 L'objectiu d'aquest projecte és analitzar de forma quantitativa l'ús de paraules que es diferencien només per l'accent diacrític (p. ex. llàstima/llastima) i que potencialment poden ser errors comuns per tal de:
 * Entendre quin espectre d'aquest tipus de paraules cobreixen les regles actuals
 * Identificar regles noves que podem crear de forma sistemàtica per solucionar aquests casos
+
+Al LanguageTool tenim més de 3500 de regles que han anat creixent amb els anys per a identificar aquests errors.
 
 # Dades
 
