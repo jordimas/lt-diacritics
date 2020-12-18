@@ -16,6 +16,21 @@ Ara entenem la freqüència d'aparició d'aquests parells (per exemple bàsquet/
 
 ![Freqüencia d'aparició de diacrítics](frequencia-diacritics.png)
 
+# Metodologia 
+
+## Primera fase
+
+Objectiu: detectar paraules poc freqüents podem assenyalar com a error
+
+Metodologia:
+* Extraiem del corpus exemples del seu ús amb accent
+* Demanem a LanguageTool que indiqui quants errors té l'exemple
+* Llevem l'accent de la paraula
+* Demanem a LanguageTool que indiqui quants errors té l'exemple sense accent
+
+Això ens permet identificar de forma sistemàtica les formes que es poden confondre, que no detectem, i que per freqüencia d'aparició podem fer una recomanació a l'usuari.
+
+
 # Resultats del projecte (18 desembre)
 
 Millores a LanguageTool 5.2:
