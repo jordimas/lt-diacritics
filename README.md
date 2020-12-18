@@ -20,7 +20,7 @@ Ara entenem la freqüència d'aparició d'aquests parells (per exemple bàsquet/
 
 ## Primera fase
 
-Objectiu: detectar paraules poc freqüents podem assenyalar com a error
+Objectiu: detectar paraules poc freqüents que es poden confondre podem assenyalar com a error
 
 Metodologia:
 * Extraiem del corpus exemples del seu ús amb accent
@@ -28,7 +28,13 @@ Metodologia:
 * Llevem l'accent de la paraula
 * Demanem a LanguageTool que indiqui quants errors té l'exemple sense accent
 
-Això ens permet identificar de forma sistemàtica les formes que es poden confondre, que no detectem, i que per freqüencia d'aparició podem fer una recomanació a l'usuari.
+Això ens permet identificar de forma sistemàtica les formes que es poden confondre, que no detectem, i que per freqüència d'aparició podem fer una recomanació a l'usuari.
+
+## Segona fase
+
+Objectiu: detectar paraules freqüents que es poden confondre podem assenyalar com a error
+
+Per paraules on la freqüència d'aparició amb diacrític i sense està més igualada provarem de fer regles genèriques i veure de forma sistemàtica quines funcionen millor avaluant-les de forma les diferents versions contra corpus e introduint errors.
 
 
 # Resultats del projecte (18 desembre)
